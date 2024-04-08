@@ -58,6 +58,7 @@ require("src/input_history")
 require("src/attack_data")
 require("src/frame_advantage")
 require("src/character_select")
+require("src/training_addons")
 
 recording_slot_count = 8
 
@@ -81,6 +82,9 @@ log_categories_display =
 
 saved_recordings_path = "saved/recordings/"
 training_settings_file = "training_settings.json"
+
+is_recording_enabled = true
+_modules = get_module_list()
 
 -- players
 function queue_input_sequence(_player_obj, _sequence, _offset)
@@ -576,6 +580,12 @@ function save_training_data()
   backup_recordings()
   if not write_object_to_json_file(training_settings, saved_path..training_settings_file) then
     print(string.format("Error: Failed to save training settings to \"%s\"", training_settings_file))
+  end
+end
+
+function reset_training_data()
+  for _key, _value in pairs(default_training_settings) do
+    training_settings[_key] = _value
   end
 end
 
@@ -1590,7 +1600,7 @@ load_recording_slot_popup = make_menu(71, 61, 312, 122, -- screen size 383,223
 
 -- GUI DECLARATION
 
-training_settings = {
+default_training_settings = {
   pose = 1,
   blocking_style = 1,
   blocking_mode = 1,
@@ -1639,6 +1649,12 @@ training_settings = {
   special_training_parry_antiair_on = true,
   special_training_charge_overcharge_on = false,
 }
+
+training_settings = {}
+
+for _key, _value in pairs(default_training_settings) do
+    training_settings[_key] = _value
+end
 
 debug_settings = {
   show_predicted_hitbox = false,
@@ -1719,6 +1735,11 @@ mid_distance_height_item.is_disabled = function()
   return not training_settings.display_distances
 end
 
+open_addon_item = button_menu_item("Open addon menu", function() open_addon_menu(_modules) end)
+open_addon_item.is_disabled = function()
+  return _modules.module_id == 1
+end
+
 main_menu = make_multitab_menu(
   23, 15, 360, 195, -- screen size 383,223
   {
@@ -1797,7 +1818,9 @@ main_menu = make_multitab_menu(
         parry_down_on_item,
         parry_air_on_item,
         parry_antiair_on_item,
-        charge_overcharge_on_item
+        charge_overcharge_on_item,
+        list_menu_item("Training addons", _modules, "module_id", _modules.module_name),
+        open_addon_item
       }
     },
   },
@@ -2012,7 +2035,7 @@ end
 function update_recording(_input)
 
   local _input_buffer_length = 11
-  if is_in_match and not is_menu_open then
+  if is_in_match and not is_menu_open and is_recording_enabled then
 
     -- manage input
     local _input_pressed = (not swap_characters and player.input.pressed.coin) or (swap_characters and dummy.input.pressed.coin)
