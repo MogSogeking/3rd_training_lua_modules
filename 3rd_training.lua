@@ -84,7 +84,14 @@ saved_recordings_path = "saved/recordings/"
 training_settings_file = "training_settings.json"
 
 is_recording_enabled = true
+_current_module = nil
 _modules = get_module_list()
+
+function update_current_module(_input)
+  if _current_module ~= nil then
+    _current_module.update(_input)
+  end
+end
 
 -- players
 function queue_input_sequence(_player_obj, _sequence, _offset)
@@ -229,6 +236,15 @@ function make_input_empty(_input)
     return
   end
 
+  make_input_empty_p1(_input)
+  make_input_empty_p2(_input)
+end
+
+function make_input_empty_p1(_input)
+  if _input == nil then
+    return
+  end
+
   _input["P1 Up"] = false
   _input["P1 Down"] = false
   _input["P1 Left"] = false
@@ -241,6 +257,13 @@ function make_input_empty(_input)
   _input["P1 Strong Kick"] = false
   _input["P1 Start"] = false
   _input["P1 Coin"] = false
+end
+
+function make_input_empty_p2(_input)
+  if _input == nil then
+    return
+  end
+
   _input["P2 Up"] = false
   _input["P2 Down"] = false
   _input["P2 Left"] = false
@@ -254,7 +277,6 @@ function make_input_empty(_input)
   _input["P2 Start"] = false
   _input["P2 Coin"] = false
 end
-
 
 -- training settings
 pose = {
@@ -546,6 +568,31 @@ special_training_mode = {
   "parry",
   "charge",
   "Hyakuretsu Kyaku (Chun Li)"
+}
+
+character_select_data =
+{
+  gill =                      { id = 0x00, col = 3, row = 1 },
+  alex =                      { id = 0x01, col = 0, row = 1 },
+  ryu =                       { id = 0x02, col = 2, row = 5 },
+  yun =                       { id = 0x03, col = 1, row = 6 },
+  dudley =                    { id = 0x04, col = 2, row = 3 },
+  necro =                     { id = 0x05, col = 0, row = 4 },
+  hugo =                      { id = 0x06, col = 2, row = 1 },
+  ibuki =                     { id = 0x07, col = 0, row = 3 },
+  elena =                     { id = 0x08, col = 2, row = 2 },
+  oro =                       { id = 0x09, col = 2, row = 4 },
+  yang =                      { id = 0x0A, col = 1, row = 0 },
+  ken =                       { id = 0x0B, col = 2, row = 0 },
+  sean =                      { id = 0x0C, col = 0, row = 2 },
+  urien =                     { id = 0x0D, col = 0, row = 5 },
+  gouki =                     { id = 0x0E, col = 0, row = 6 },
+  shinGouki =                 { id = 0x0F, col = 0, row = 6 },
+  chunli =                    { id = 0x10, col = 1, row = 3 },
+  makoto =                    { id = 0x11, col = 1, row = 2 },
+  q =                         { id = 0x12, col = 1, row = 4 },
+  twelve =                    { id = 0x13, col = 1, row = 1 },
+  remy =                      { id = 0x14, col = 1, row = 5 },
 }
 
 function make_recording_slot()
@@ -2303,7 +2350,6 @@ if rom_name == "sfiii3nr1" then
 end
 
 function before_frame()
-
   -- update debug menu
   if debug_settings.debug_character ~= debug_move_menu_item.map_property then
     debug_move_menu_item.map_object = frame_data
@@ -2400,6 +2446,8 @@ function before_frame()
     attack_data_reset()
     frame_advantage_reset()
   end
+
+  update_current_module()
 
   -- character select
   update_character_select(_input, training_settings.fast_forward_intro)

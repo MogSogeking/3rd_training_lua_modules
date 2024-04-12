@@ -5,7 +5,7 @@ training_addons_path = "src/training_addons/"
 
 function get_module_list()
   print("Loading modules")
-  local module_list = {module_id = 1, module_name = {"none"}, module_entry_point = {""}}
+  local module_list = {module_id = 1, module_name = {"none"}, module_entry_point = {""}, module_config = {{}}}
   local _cmd = "dir /b /a:d "..string.gsub(training_addons_path, "/", "\\")
   local _f = io.popen(_cmd)
 
@@ -31,6 +31,7 @@ function get_module_list()
           print(string.format('Module: %s found', _config.module_name or _line))
           table.insert(module_list["module_name"], _config.module_name or _line)
           table.insert(module_list["module_entry_point"], ""..string.gsub(_entry_point_path, ".lua", ""))
+          table.insert(module_list["module_config"], _config)
         else
           print(string.format('Warning: Entry point %s/%s not found', _line, entry_point_with_ext))
           print("-- Will skip module --")
@@ -53,6 +54,8 @@ function open_addon_menu(modules)
   local _module = require(modules.module_entry_point[modules.module_id])
   if _module == nil then return end
 
+  _module.set_config(modules.module_config[modules.module_id])
+  _current_module = _module
   _module.open_menu()
 end
 

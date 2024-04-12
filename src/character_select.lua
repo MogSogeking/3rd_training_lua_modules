@@ -1,5 +1,7 @@
 
 character_select_coroutine = nil
+secondary_character_select_coroutine = nil
+
 
 -- 0 is out
 -- 1 is waiting for input release for p1
@@ -8,11 +10,13 @@ character_select_coroutine = nil
 -- 4 is selecting p2
 character_select_sequence_state = 0
 
-function co_wait_x_frames(_frame_count)
+-- _input as a parameter to be able to write it back from yield
+function co_wait_x_frames(_frame_count, _input)
   local _start_frame = frame_number
   while frame_number < _start_frame + _frame_count do
-    coroutine.yield()
+    _input = coroutine.yield()
   end
+  return _input
 end
 
 function start_character_select_sequence()
@@ -20,8 +24,16 @@ function start_character_select_sequence()
   character_select_sequence_state = 1
 end
 
+function create_character_select_coroutine(_coroutine)
+  if character_select_coroutine == nil then
+    character_select_coroutine = coroutine.create(_coroutine)
+  elseif secondary_character_select_coroutine == nil then
+    secondary_character_select_coroutine = coroutine.create(_coroutine)
+  end
+end
+
 function select_gill()
-  character_select_coroutine = coroutine.create(co_select_gill)
+  create_character_select_coroutine(co_select_gill)
 end
 
 function co_select_gill(_input)
@@ -48,7 +60,7 @@ function co_select_gill(_input)
 end
 
 function select_shingouki()
-  character_select_coroutine = coroutine.create(co_select_shingouki)
+  create_character_select_coroutine(co_select_shingouki)
 end
 
 function co_select_shingouki(_input)
@@ -78,26 +90,73 @@ function co_select_shingouki(_input)
   memory.writebyte(adresses.players[_player_id].character_select_id, 0x0F)
 end
 
-function update_character_select(_input, _do_fast_forward)
+function select_character(_player_id, _character, _color, _sa)
+  create_character_select_coroutine(function(_input) co_select_character(_input, _player_id, _character, _color, _sa) end)
+end
 
-  if not character_select_sequence_state == 0 then
+function co_select_character(_input, _player_id, character, _color, _sa)
+  local character_select_state = memory.readbyte(adresses.players[_player_id].character_select_state)
+  local make_input_empty_player
+
+  if _player_id == 1 then
+    make_input_empty_player = make_input_empty_p1
+  else
+    make_input_empty_player = make_input_empty_p2
+  end
+
+  if character_select_state > 2 then
     return
   end
+
+  memory.writebyte(adresses.players[_player_id].character_select_col, character.col)
+  memory.writebyte(adresses.players[_player_id].character_select_row, character.row)
+
+  make_input_empty_player(_input)
+  _input[player_objects[_player_id].prefix.." Weak Punch"] = true
+
+  _input = co_wait_x_frames(20)
+
+  memory.writebyte(adresses.players[_player_id].character_select_id, character.id)
+  memory.writebyte(adresses.players[_player_id].character_select_color, _color)
+
+  _input = co_wait_x_frames(30)
+
+  make_input_empty_player(_input)
+  _input[player_objects[_player_id].prefix.." Weak Punch"] = true
+
+  memory.writebyte(adresses.players[_player_id].character_select_sa, _sa)
+end
+
+function update_character_select(_input, _do_fast_forward)
+
+  -- Always false, what was its intended purpose ?
+  -- if not character_select_sequence_state == 0 then
+  --   return
+  -- end
 
   -- Infinite select time
   --memory.writebyte(adresses.global.character_select_timer, 0x30)
 
-  if (character_select_coroutine ~= nil) then
-    make_input_empty(_input)
-    local _status = coroutine.status(character_select_coroutine)
+  function check_coroutine(_coroutine, _input)
+    if _coroutine == nil then return end
+
+    local _status = coroutine.status(_coroutine)
     if _status == "suspended" then
-      local _r, _error = coroutine.resume(character_select_coroutine, _input)
+      local _r, _error = coroutine.resume(_coroutine, _input)
       if not _r then
         print(_error)
       end
     elseif _status == "dead" then
-      character_select_coroutine = nil
+      return nil
     end
+    return _coroutine
+  end
+
+  if character_select_coroutine ~= nil or secondary_character_select_coroutine ~= nil then
+    make_input_empty(_input)
+
+    character_select_coroutine = check_coroutine(character_select_coroutine, _input)
+    secondary_character_select_coroutine = check_coroutine(secondary_character_select_coroutine, _input)
     return
   end
 

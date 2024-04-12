@@ -1,4 +1,15 @@
 {
   "module_name": "Necro",
-  "entry_point": "index.lua"
+  "entry_point": "index.lua",
+  "color_button": 2,
+  "routine": false,
+  "selected_mode": 1,
+
+  "elbow_cannon": {
+    "opponent": 1,
+    "attempts": 5,
+    "side": 1,
+    "swap_side": 1,
+    "enabled": true,
+  }
 }
