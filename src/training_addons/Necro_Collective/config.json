@@ -11,5 +11,13 @@
     "side": 1,
     "swap_side": 1,
     "enabled": true,
+  },
+
+  "stun_juggles": {
+    "opponent": 1,
+    "attempts": 5,
+    "side": 1,
+    "swap_side": 1,
+    "enabled": true,
   }
 }

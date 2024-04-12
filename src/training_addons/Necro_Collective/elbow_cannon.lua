@@ -44,11 +44,11 @@ function _elbow_cannon.set_menu()
   return {
     name = "Elbow cannon",
     entries = {
-      list_menu_item("Opponent", _config.elbow_cannon, "opponent", opponent),
       integer_menu_item("Attempts", _config.elbow_cannon, "attempts", 1, 100, true, 10),
       list_menu_item("Side", _config.elbow_cannon, "side", side),
       list_menu_item("Swap side", _config.elbow_cannon, "swap_side", swap_side),
       checkbox_menu_item("Enabled in routine", _config.elbow_cannon, "enabled", true),
+      list_menu_item("Opponent", _config.elbow_cannon, "opponent", opponent),
       button_menu_item("Start", function() end),
     }
   }
@@ -91,12 +91,12 @@ function _elbow_cannon.start()
   local p1 = {
     character = character_select_data.necro,
     color = _config.color_button,
-    sa = 2
+    sa = 3
   }
   local p2 = {
     character = character_select_data[string.lower(opponent[_config.elbow_cannon.opponent])],
     color = 3,
-    sa = 2
+    sa = 3
   }
   character_select(p1, p2)
   current_attempt = 1

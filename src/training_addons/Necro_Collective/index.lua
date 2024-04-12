@@ -1,11 +1,13 @@
 local _elbow_cannon = require("src/training_addons/Necro_Collective/elbow_cannon")
+local _stun_juggles = require("src/training_addons/Necro_Collective/stun_juggles")
 
 local necro = {}
 local menu = nil
 local current_training = 0
 
 local routine = {
-  _elbow_cannon
+  _elbow_cannon,
+  _stun_juggles,
 }
 
 local color_button = {
@@ -19,12 +21,35 @@ local color_button = {
 }
 
 local selected_mode = {
-  "elbow cannon"
+  "elbow cannon",
+  "stun juggles"
 }
 
 necro.constants = {
   timer_cyphers_width = 16,
-  timer_cyphers_height = 26
+  timer_cyphers_height = 26,
+  whole_cast = {
+    "Alex",
+    "Chun-li",
+    "Dudley",
+    "Elena",
+    "Gill",
+    "Gouki",
+    "Hugo",
+    "Ibuki",
+    "Ken",
+    "Makoto",
+    "Necro",
+    "Oro",
+    "Q",
+    "Remy",
+    "Ryu",
+    "Sean",
+    "Twelve",
+    "Urien",
+    "Yang",
+    "Yun",
+  }
 }
 necro.config = {}
 
@@ -60,7 +85,8 @@ function set_menu()
           button_menu_item("Start", necro.start_routine)
         }
       },
-      _elbow_cannon.set_menu()
+      _elbow_cannon.set_menu(),
+      _stun_juggles.set_menu(),
     },
     function ()
     end
@@ -69,8 +95,8 @@ end
 
 function character_select(p1, p2)
   start_character_select_sequence()
-  select_character(1, p1.character, p1.color - 1, p1.sa)
-  select_character(2, p2.character, p2.color - 1, p2.sa)
+  select_character(1, p1.character, p1.color - 1, p1.sa - 1)
+  select_character(2, p2.character, p2.color - 1, p2.sa - 1)
   emu.speedmode("turbo")
 end
 
@@ -94,7 +120,12 @@ function necro.update()
 end
 
 function necro.end_training()
-  necro.end_routine()
+  if current_training < #routine then
+    current_training = current_training + 1
+    routine[current_training].start()
+  else
+    necro.end_routine()
+  end
 end
 
 function necro.end_routine()
