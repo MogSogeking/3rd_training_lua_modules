@@ -1,13 +1,16 @@
 local _elbow_cannon = require("src/training_addons/Necro_Collective/elbow_cannon")
 local _stun_juggles = require("src/training_addons/Necro_Collective/stun_juggles")
+local _hit_confirm = require("src/training_addons/Hit_Confirm/hit_confirm")
 
 local necro = {}
 local menu = nil
 local current_training = 0
+local is_routine = false
 
 local routine = {
   _elbow_cannon,
   _stun_juggles,
+  _hit_confirm,
 }
 
 local color_button = {
@@ -22,15 +25,27 @@ local color_button = {
 
 local selected_mode = {
   "elbow cannon",
-  "stun juggles"
+  "stun juggles",
+  "hit confirm",
 }
+
+local _routine_menu = make_menu(100, 79, 283, 160, -- screen size 383,223,
+  {
+    button_menu_item("Skip", function()
+      necro.end_training()
+    end),
+    button_menu_item("Quit", function()
+      necro.end_routine()
+    end),
+  }
+)
 
 necro.constants = {
   timer_cyphers_width = 16,
   timer_cyphers_height = 26,
   whole_cast = {
     "Alex",
-    "Chun-li",
+    "ChunLi",
     "Dudley",
     "Elena",
     "Gill",
@@ -49,6 +64,18 @@ necro.constants = {
     "Urien",
     "Yang",
     "Yun",
+  },
+  training_data_to_keep = {
+    display_frame_advantage = true,
+    music_volume = true,
+    display_p1_input_history = true,
+    display_distances = true,
+    display_p1_input_history_dyanamic = true,
+    display_input = true,
+    display_gauges = true,
+    display_attack_data = true,
+    display_p2_input_history = true,
+    display_hitboxes = true,
   }
 }
 necro.config = {}
@@ -80,6 +107,7 @@ function set_menu()
         name = "General",
         entries = {
           list_menu_item("Color", necro.config, "color_button", color_button),
+          list_menu_item("Favorite opponent", necro.config, "favorite_opponent", necro.constants.whole_cast),
           checkbox_menu_item("Routine mode", necro.config, "routine"),
           list_menu_item("Selected mode", necro.config, "selected_mode", selected_mode),
           button_menu_item("Start", necro.start_routine)
@@ -87,8 +115,16 @@ function set_menu()
       },
       _elbow_cannon.set_menu(),
       _stun_juggles.set_menu(),
+      _hit_confirm.set_menu({
+        "src/training_addons/Necro_Collective/data/hit_confirm.json",
+        "src/training_addons/Necro_Collective/data/hit_confirm_2.json",
+        "src/training_addons/Necro_Collective/data/hit_confirm_3.json"
+      }),
     },
-    function ()
+    function (_menu)
+      if _menu.content[_menu.main_menu_selected_index].name == "Hit confirm" then
+        _hit_confirm.update_menu(_menu)
+      end
     end
   )
 end
@@ -101,11 +137,24 @@ function character_select(p1, p2)
 end
 
 function necro.start_routine()
+  reset_training_data(necro.constants.training_data_to_keep)
   if necro.config.routine then
     current_training = 1
+    is_routine = true
+    current_menu = _routine_menu
   else
     current_training = necro.config.selected_mode
+    is_routine = false
+    current_menu = routine[current_training].training_menu
   end
+  routine[current_training].start()
+end
+
+function necro.start()
+  reset_training_data(necro.constants.training_data_to_keep)
+  current_training = menu.main_menu_selected_index - 1
+  is_routine = false
+  current_menu = routine[current_training].training_menu
   routine[current_training].start()
 end
 
@@ -120,7 +169,7 @@ function necro.update()
 end
 
 function necro.end_training()
-  if current_training < #routine then
+  if current_training < #routine and is_routine then
     current_training = current_training + 1
     routine[current_training].start()
   else
@@ -131,6 +180,15 @@ end
 function necro.end_routine()
   current_training = 0
   savestate.load(savestate.create("data/"..rom_name.."/savestates/results.fs"))
+end
+
+function necro.quit_training()
+  current_training = 0
+  current_menu = main_menu
+  _current_module = nil
+  is_menu_open = false
+  menu_stack_clear()
+  load_training_data()
 end
 
 return necro

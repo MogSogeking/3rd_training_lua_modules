@@ -1,0 +1,21 @@
+{
+  "character": "necro",
+  "list": {
+    "4LK.5MP.SA3": {
+      "opponent": {"any"},
+      "sa": 3,
+      "hit_to_confirm": 3,
+      "hits": ["4LK", "4LK.5MP", "SA3", "SA3", "SA3"],
+      "opponent_stance": ["standing", "crouching"],
+      "players_distance": 40,
+    },
+    "JHK.SA3": {
+      "opponent": {"any"},
+      "sa": 3,
+      "hit_to_confirm": 2,
+      "hits": ["JHK", "SA3", "SA3", "SA3"],
+      "opponent_stance": ["standing", "crouching"],
+      "players_distance": 150,
+    },
+  }
+}

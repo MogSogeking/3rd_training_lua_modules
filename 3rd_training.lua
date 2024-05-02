@@ -86,6 +86,7 @@ training_settings_file = "training_settings.json"
 is_recording_enabled = true
 _current_module = nil
 _modules = get_module_list()
+current_menu = nil
 
 function update_current_module(_input)
   if _current_module ~= nil then
@@ -630,9 +631,12 @@ function save_training_data()
   end
 end
 
-function reset_training_data()
+function reset_training_data(_keep)
+  _keep = _keep or {}
   for _key, _value in pairs(default_training_settings) do
-    training_settings[_key] = _value
+    if _keep[_key] == nil then
+      training_settings[_key] = _value
+    end
   end
 end
 
@@ -1900,6 +1904,8 @@ if developer_mode then
   table.insert(main_menu.content, _debug_settings_menu)
 end
 
+current_menu = main_menu
+
 -- RECORDING
 swap_characters = false
 -- 1: Default Mode, 2: Wait for recording, 3: Recording, 4: Replaying
@@ -2328,6 +2334,7 @@ end
 
 function hotkey1()
   set_recording_state({}, 1)
+  current_menu = main_menu
   start_character_select_sequence()
 end
 
@@ -2937,7 +2944,7 @@ function on_gui()
     if _should_toggle then
       is_menu_open = (not is_menu_open)
       if is_menu_open then
-        menu_stack_push(main_menu)
+        menu_stack_push(current_menu)
       else
         menu_stack_clear()
       end

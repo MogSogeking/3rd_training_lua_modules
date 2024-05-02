@@ -4,6 +4,7 @@
   "color_button": 2,
   "routine": false,
   "selected_mode": 1,
+  "favorite_opponent":1,
 
   "elbow_cannon": {
     "opponent": 1,
@@ -11,6 +12,7 @@
     "side": 1,
     "swap_side": 1,
     "enabled": true,
+    "continue": true,
   },
 
   "stun_juggles": {
@@ -19,5 +21,6 @@
     "side": 1,
     "swap_side": 1,
     "enabled": true,
+    "continue": true,
   }
 }

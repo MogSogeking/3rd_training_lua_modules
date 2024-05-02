@@ -499,10 +499,11 @@ function map_menu_item(_name, _object, _property_name, _map_object, _map_propert
   return _o
 end
 
-function button_menu_item(_name, _validate_function)
+function button_menu_item(_name, _validate_function, _validate_input)
   local _o = {}
   _o.name = _name
   _o.validate_function = _validate_function
+  _o.validate_input = _validate_input
   _o.last_frame_validated = 0
 
   function _o:draw(_x, _y, _selected)

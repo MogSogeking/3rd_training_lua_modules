@@ -1,6 +1,9 @@
 local _elbow_cannon = {
   is_enabled = false,
-  has_ended = false
+  has_ended = false,
+  training_menu = make_menu(100, 79, 283, 170, -- screen size 383,223
+    {}
+  ),
 }
 
 local opponent = {
@@ -38,18 +41,29 @@ local high_score = 0
 local scores_history = {}
 local swapped = false
 
+local _tmp_config = {
+  attempts = 5,
+  side = 1,
+  swap_side = 1,
+  opponent = 1,
+  continue = false,
+}
+
 function _elbow_cannon.set_menu()
   _config = _current_module.config
   print(opponent, swap_side, side)
   return {
     name = "Elbow cannon",
     entries = {
-      integer_menu_item("Attempts", _config.elbow_cannon, "attempts", 1, 100, true, 10),
+      integer_menu_item("Attempts", _config.elbow_cannon, "attempts", 0, 100, true, 10),
       list_menu_item("Side", _config.elbow_cannon, "side", side),
       list_menu_item("Swap side", _config.elbow_cannon, "swap_side", swap_side),
       checkbox_menu_item("Enabled in routine", _config.elbow_cannon, "enabled", true),
+      checkbox_menu_item("Continue beyond attempts", _config.elbow_cannon, "continue", true),
       list_menu_item("Opponent", _config.elbow_cannon, "opponent", opponent),
-      button_menu_item("Start", function() end),
+      button_menu_item("Start", function()
+        _current_module.start()
+      end),
     }
   }
 end
@@ -99,11 +113,71 @@ function _elbow_cannon.start()
     sa = 3
   }
   character_select(p1, p2)
+  _elbow_cannon.has_ended = false
+
+  _elbow_cannon.training_menu.content = {
+    integer_menu_item("Attempts", _tmp_config, "attempts", 0, 100, true, 10),
+    list_menu_item("Side", _tmp_config, "side", side),
+    list_menu_item("Swap side", _tmp_config, "swap_side", swap_side),
+    checkbox_menu_item("Continue beyond attempts", _tmp_config, "continue", false),
+    list_menu_item("Opponent", _tmp_config, "opponent", opponent),
+    button_menu_item("Restart", function()
+      -- TODO : refactor menu_widget to allow input release to fire button function
+      is_menu_open = false
+      menu_stack_clear()
+      _elbow_cannon.apply_changes()
+    end),
+    button_menu_item("Quit", function()
+      _current_module.quit_training()
+    end),
+  }
+end
+
+function _elbow_cannon.apply_changes()
+  _config.elbow_cannon.attempts = _tmp_config.attempts
+  _config.elbow_cannon.side = _tmp_config.side
+  _config.elbow_cannon.swap_side = _tmp_config.swap_side
+  _config.elbow_cannon.continue = _tmp_config.continue
+
+  if _tmp_config.opponent ~= _config.elbow_cannon.opponent then
+    _config.elbow_cannon.opponent = _tmp_config.opponent
+    _elbow_cannon.start()
+  else
+    _elbow_cannon.init()
+  end
+end
+
+function set_tmp_config()
+  _tmp_config = {
+    attempts = _config.elbow_cannon.attempts,
+    side = _config.elbow_cannon.side,
+    swap_side = _config.elbow_cannon.swap_side,
+    opponent = _config.elbow_cannon.opponent,
+    continue = _config.elbow_cannon.continue,
+  }
+end
+
+function _elbow_cannon.init()
   current_attempt = 1
+  current_score = 0
+  current_side = 0
   high_score = 0
   scores_history = {}
   swapped = false
   _elbow_cannon.has_ended = false
+
+  -- Set mutable side for the session
+  current_side = _config.elbow_cannon.side
+
+  -- Teleport both players to one side of the screen
+  memory.writeword(0x02026CB0, side_coordinates[current_side][1])
+  memory.writeword(player_objects[2].base + 0x64, side_coordinates[current_side][3])
+  memory.writeword(player_objects[1].base + 0x64, side_coordinates[current_side][2])
+
+  -- Take control over the timer
+  training_settings.infinite_time = false
+  -- Set it to 11 to hide the real timer as much as possible
+  memory.writebyte(0x02011377, 12)
 end
 
 local function _draw_overlay(tenths, units)
@@ -122,19 +196,7 @@ function _elbow_cannon.update()
   if not is_in_match then return end
 
   if has_match_just_started then
-
-    -- Set mutable side for the session
-    current_side = _config.elbow_cannon.side
-
-    -- Teleport both players to one side of the screen
-    memory.writeword(0x02026CB0, side_coordinates[current_side][1])
-    memory.writeword(player_objects[2].base + 0x64, side_coordinates[current_side][3])
-    memory.writeword(player_objects[1].base + 0x64, side_coordinates[current_side][2])
-
-    -- Take control over the timer
-    training_settings.infinite_time = false
-    -- Set it to 11 to hide the real timer as much as possible
-    memory.writebyte(0x02011377, 12)
+    _elbow_cannon.init()
   end
 
   -- Set Necro's damage output to 0 to not have to deal with it
@@ -166,14 +228,19 @@ function _elbow_cannon.update()
   if player_objects[2].has_just_woke_up then
     if swap_side[_config.elbow_cannon.swap_side] == "Random" then
       current_side = math.random(1, 2)
-    elseif swap_side[_config.elbow_cannon.swap_side] == "Halfway" and not swapped and (current_attempt * 2) >= _config.elbow_cannon.attempts then
-      swapped = true
-      current_side = (current_side - 3) * -1
+    elseif swap_side[_config.elbow_cannon.swap_side] == "Halfway" then
+      if ((current_attempt % _config.elbow_cannon.attempts) * 2) >= _config.elbow_cannon.attempts and not swapped then
+        swapped = true
+        current_side = (current_side - 3) * -1
+      elseif (current_attempt % _config.elbow_cannon.attempts) == 0 and swapped then
+        swapped = false
+        current_side = (current_side - 3) * -1
+      end
     end
 
     current_attempt = current_attempt + 1
 
-    if current_attempt > _config.elbow_cannon.attempts then
+    if _config.elbow_cannon.attempts > 0 and current_attempt > _config.elbow_cannon.attempts and not _config.elbow_cannon.continue then
       _elbow_cannon.has_ended = true
     end
     memory.writeword(0x02026CB0, side_coordinates[current_side][1])

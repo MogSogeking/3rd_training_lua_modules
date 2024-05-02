@@ -1,4 +1,4 @@
-local _ = {
+local _template = {
   is_enabled = false,
   has_ended = false
 }
@@ -25,13 +25,13 @@ function _template.start()
   -- This snippet allows for a fast character pick
   -- local p1 = {
   --   character = character_select_data.alex,
-  --   color = 0,
-  --   sa = 0,
+  --   color = 1,
+  --   sa = 1,
   -- }
   -- local p2 = {
   --   character = character_select_data.ryu,
-  --   color = 0,
-  --   sa = 0,
+  --   color = 1,
+  --   sa = 1,
   -- }
   -- character_select(p1, p2)
 
