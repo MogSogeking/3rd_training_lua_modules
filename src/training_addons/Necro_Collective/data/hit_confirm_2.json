@@ -6,7 +6,7 @@
       "sa": 3,
       "hit_to_confirm": 3,
       "hits": ["4LK", "4LK.5MP", "SA3", "SA3", "SA3"],
-      "opponent_stance": ["standing", "crouching"],
+      "opponent_stance": ["normal", "crouching"],
       "players_distance": 40,
     },
     "JHK.SA3": {
@@ -14,7 +14,7 @@
       "sa": 3,
       "hit_to_confirm": 2,
       "hits": ["JHK", "SA3", "SA3", "SA3"],
-      "opponent_stance": ["standing", "crouching"],
+      "opponent_stance": ["normal", "crouching"],
       "players_distance": 150,
     },
   }

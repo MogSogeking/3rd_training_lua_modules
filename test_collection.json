@@ -1,11 +1,32 @@
 {
+  "character":1,
+  "continue":false,
+  "ken":{
+    "confirm":1,
+    "2LK.2LK.SA3":{
+      "enabled":true,
+      "guard_weight":5,
+      "hit_to_confirm":3,
+      "opponent_stance":["normal","crouching"],
+      "players_distance":40,
+      "sa":3,
+      "total_confirmed":5,
+      "swap_side":1,
+      "side":1,
+      "opponent_index":1,
+      "dynamic":false,
+      "hits":[0,0,0,0,0,0,0,0,0],
+      "opponent":["any"]
+    }
+  },
+  "character_list":["necro","ken"],
   "necro":{
     "confirm":1,
     "4MP.SA3":{
       "enabled":true,
       "guard_weight":5,
       "hit_to_confirm":2,
-      "opponent_stance":["standing","crouching"],
+      "opponent_stance":["normal","crouching"],
       "players_distance":100,
       "sa":3,
       "total_confirmed":5,
@@ -20,7 +41,7 @@
       "enabled":true,
       "guard_weight":5,
       "hit_to_confirm":3,
-      "opponent_stance":["standing","crouching"],
+      "opponent_stance":["normal","crouching"],
       "players_distance":40,
       "sa":3,
       "total_confirmed":5,
@@ -31,11 +52,26 @@
       "hits":["4LK","4LK.5MP","SA3","SA3","SA3"],
       "opponent":["any"]
     },
+    "MPMK.SA3":{
+      "enabled":true,
+      "guard_weight":5,
+      "hit_to_confirm":2,
+      "opponent_stance":["crouching"],
+      "players_distance":140,
+      "sa":3,
+      "total_confirmed":5,
+      "swap_side":1,
+      "side":1,
+      "opponent_index":1,
+      "dynamic":false,
+      "hits":["MPMK","SA3","SA3","SA3"],
+      "opponent":["any"]
+    },
     "JHK.SA3":{
       "enabled":true,
       "guard_weight":5,
       "hit_to_confirm":2,
-      "opponent_stance":["standing","crouching"],
+      "opponent_stance":["normal","crouching"],
       "players_distance":150,
       "sa":3,
       "total_confirmed":5,
@@ -50,7 +86,7 @@
       "enabled":true,
       "guard_weight":5,
       "hit_to_confirm":3,
-      "opponent_stance":["standing","crouching"],
+      "opponent_stance":["normal","crouching"],
       "players_distance":40,
       "sa":3,
       "total_confirmed":5,
@@ -65,7 +101,7 @@
       "enabled":true,
       "guard_weight":5,
       "hit_to_confirm":2,
-      "opponent_stance":["standing","crouching"],
+      "opponent_stance":["normal","crouching"],
       "players_distance":40,
       "sa":3,
       "total_confirmed":5,
@@ -76,8 +112,5 @@
       "hits":["623LP","SA3","SA3","SA3"],
       "opponent":["any"]
     }
-  },
-  "character":1,
-  "character_list":["necro"],
-  "continue":false
+  }
 }

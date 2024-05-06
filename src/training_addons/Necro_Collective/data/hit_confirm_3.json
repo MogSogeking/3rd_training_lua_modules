@@ -6,7 +6,7 @@
       "sa": 3,
       "hit_to_confirm": 3,
       "hits": [0, 0, 0, 0, 0, 0, 0, 0, 0],
-      "opponent_stance": ["standing", "crouching"],
+      "opponent_stance": ["normal", "crouching"],
       "players_distance": 40,
     },
   }

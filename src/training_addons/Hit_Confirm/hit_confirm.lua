@@ -512,6 +512,14 @@ function _hit_confirm.init()
   memory.writeword(player_objects[1].base + 0x64, _p1_pos_x_sided)
 end
 
+function get_stance(_name)
+  if _name == "crouching" then return 2
+  elseif _name == "jumping" then return 3
+  elseif _name == "highjumping" then return 4
+  end
+  return 1
+end
+
 function _hit_confirm.update()
   if not is_in_match then return end
 
@@ -522,6 +530,10 @@ function _hit_confirm.update()
   local selected_confirm = get_selected_confirm()
 
   if player_objects[2].is_idle and player_objects[2].idle_time == 1 then
+
+    local _stance = get_stance(selected_confirm.opponent_stance[math.random(1, #selected_confirm.opponent_stance)])
+
+    training_settings.pose = _stance
 
     if swap_side[selected_confirm.swap_side] == "Random" then
       _current_side = math.random(1, 2)
@@ -595,5 +607,4 @@ return _hit_confirm
 -- TODO:
 
 -- Refactor
--- Crouch confirms
 -- Dynamic mode

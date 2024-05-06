@@ -6,7 +6,7 @@
       "sa": 3,
       "hit_to_confirm": 2,
       "hits": ["4MP", "SA3", "SA3", "SA3"],
-      "opponent_stance": ["standing", "crouching"],
+      "opponent_stance": ["normal", "crouching"],
       "players_distance": 100,
     },
     "4LK.5MP.SA3": {
@@ -14,7 +14,7 @@
       "sa": 3,
       "hit_to_confirm": 3,
       "hits": ["4LK", "4LK.5MP", "SA3", "SA3", "SA3"],
-      "opponent_stance": ["standing", "crouching"],
+      "opponent_stance": ["normal", "crouching"],
       "players_distance": 40,
     },
     "623LP.SA3": {
@@ -22,7 +22,7 @@
       "sa": 3,
       "hit_to_confirm": 2,
       "hits": ["623LP", "SA3", "SA3", "SA3"],
-      "opponent_stance": ["standing", "crouching"],
+      "opponent_stance": ["normal", "crouching"],
       "players_distance": 40,
     },
     "2LK.623LP.SA3": {
@@ -30,8 +30,16 @@
       "sa": 3,
       "hit_to_confirm": 3,
       "hits": ["2LK", "623LP", "SA3", "SA3", "SA3"],
-      "opponent_stance": ["standing", "crouching"],
+      "opponent_stance": ["normal", "crouching"],
       "players_distance": 40,
+    },
+    "MPMK.SA3": {
+      "opponent": {"any"},
+      "sa": 3,
+      "hit_to_confirm": 2,
+      "hits": ["MPMK", "SA3", "SA3", "SA3"],
+      "opponent_stance": ["crouching"],
+      "players_distance": 140,
     }
   }
 }
