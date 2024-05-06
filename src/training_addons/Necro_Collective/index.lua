@@ -147,7 +147,15 @@ function necro.start_routine()
     is_routine = false
     current_menu = routine[current_training].training_menu
   end
-  routine[current_training].start()
+  while current_training <= #routine and not routine[current_training].is_enabled do
+    current_training = current_training + 1
+  end
+
+  if current_training > #routine then
+    print("No training enabled in routine. Enable at least one training.")
+  else
+    routine[current_training].start()
+  end
 end
 
 function necro.start()
@@ -159,7 +167,7 @@ function necro.start()
 end
 
 function necro.update()
-  if current_training > 0 then
+  if current_training > 0 and current_training <= #routine then
     routine[current_training].update()
     if routine[current_training].has_ended then
       necro.end_training()
@@ -169,11 +177,18 @@ function necro.update()
 end
 
 function necro.end_training()
-  if current_training < #routine and is_routine then
-    current_training = current_training + 1
-    routine[current_training].start()
-  else
+  if not is_routine then
     necro.end_routine()
+  else
+    repeat
+      current_training = current_training + 1
+    until current_training > #routine or routine[current_training].is_enabled
+
+    if current_training > #routine then
+      necro.end_routine()
+    else
+      routine[current_training].start()
+    end
   end
 end
 

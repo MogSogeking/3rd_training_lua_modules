@@ -158,6 +158,7 @@ function set_tmp_config()
 end
 
 function _elbow_cannon.init()
+  training_settings.stun_mode = 2
   current_attempt = 1
   current_score = 0
   current_side = 0
@@ -251,6 +252,8 @@ function _elbow_cannon.update()
 end
 
 return _elbow_cannon
+
+-- TODO: Remove /0 display when infinite attempts
 
 -- player_objects[2].base + 0x9F -> P2 Life (byte)
 -- player_objects[2].base + 0x64 -> P2 pos_x (word)

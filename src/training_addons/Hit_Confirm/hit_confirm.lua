@@ -1,7 +1,7 @@
 local _hit_confirm = {
   is_enabled = false,
   has_ended = false,
-  training_menu = make_menu(100, 79, 283, 170, -- screen size 383,223
+  training_menu = make_menu(100, 49, 283, 170, -- screen size 383,223
     {}
   ),
 }
@@ -30,9 +30,11 @@ local _addresses = {
   twelve =     {},
   remy =       {}
 }
+
 local _collection = {
   character = 1,
   character_list = {},
+  continue = false,
 }
 
 local _characters = {
@@ -96,6 +98,7 @@ local _tmp_config = {
   total_confirmed = 5,
   side = 1,
   swap_side = 1,
+  continue = false,
 }
 
 function TableConcat(t1,t2)
@@ -120,14 +123,15 @@ function build_collection(json_path_list)
   end
 
   for _key, _value in pairs(_collection) do
-    if _key ~= "character" and _key ~= "character_list" then
+    if _key ~= "character" and _key ~= "character_list" and _key ~= "continue" then
       for _key_2, _value_2 in pairs(_value) do
         if _key_2 ~= "confirm" then
           _value_2.guard_weight = 5
           _value_2.dynamic = false
           _value_2.opponent_index = 1
           _value_2.side = 1
-          _value_2.swap_side = false
+          _value_2.swap_side = 1
+          _value_2.enabled = true
           _value_2.total_confirmed = 5
         end
       end
@@ -155,9 +159,13 @@ function build_entries(_character_index, _character_object, _menu_type)
     return {
       _character_select,
       list_menu_item("Confirm", _tmp_config, "confirm", _confirms_array),
+      integer_menu_item("Total confirms", _tmp_config, "total_confirmed", 0, 100, true, 5),
       integer_menu_item("Guard weight", _tmp_config, "guard_weight", 0, 9, true, 5),
       checkbox_menu_item("Dynamic", _tmp_config, "dynamic", false),
       list_menu_item("Opponent", _tmp_config, "opponent_index", get_opponent_list(_current_confirm.opponent)),
+      list_menu_item("Side", _tmp_config, "side", side),
+      list_menu_item("Swap side", _tmp_config, "swap_side", swap_side),
+      checkbox_menu_item("Continue beyond total confirms", _tmp_config, "continue", false),
       button_menu_item("Restart", function()
         _hit_confirm.apply_changes()
       end),
@@ -170,9 +178,14 @@ function build_entries(_character_index, _character_object, _menu_type)
   return {
       _character_select,
       list_menu_item("Confirm", _character_object, "confirm", _confirms_array),
+      checkbox_menu_item("Enabled in routine", _current_confirm, "enabled", true),
+      integer_menu_item("Total confirms", _current_confirm, "total_confirmed", 0, 100, true, 5),
       integer_menu_item("Guard weight", _current_confirm, "guard_weight", 0, 9, true, 5),
       checkbox_menu_item("Dynamic", _current_confirm, "dynamic", false),
       list_menu_item("Opponent", _current_confirm, "opponent_index", get_opponent_list(_current_confirm.opponent)),
+      list_menu_item("Side", _current_confirm, "side", side),
+      list_menu_item("Swap side", _current_confirm, "swap_side", swap_side),
+      checkbox_menu_item("Continue beyond total confirms", _collection, "continue", false),
       button_menu_item("Start", function()
         _current_module.start()
       end),
@@ -214,6 +227,37 @@ function get_selected_confirm(_character)
   local _confirms_array = get_confirms_array(_collection.character)
   local _confirm_index = _collection[_p1].confirm
   return _collection[_p1][_confirms_array[_confirm_index]]
+end
+
+function next_confirm()
+  local _p1 = _collection.character_list[_collection.character]
+  local _confirms_array = get_confirms_array(_collection.character)
+  local _confirm_index = _collection[_p1].confirm
+  local found_next = false
+  local character_changed = false
+
+  while not found_next and not (_collection.character > #_collection.character_list) do
+    repeat
+      _confirm_index = _confirm_index + 1
+      _collection[_p1].confirm = _confirm_index
+    until _confirm_index > #_confirms_array or _collection[_p1][_confirms_array[_confirm_index]].enabled
+
+
+    if _confirm_index > #_confirms_array then
+      _confirm_index = 0
+      _collection[_p1].confirm = 1
+      _collection.character = _collection.character + 1
+      if _collection.character <= #_collection.character_list then
+        _p1 = _collection.character_list[_collection.character]
+        _confirms_array = get_confirms_array(_collection.character)
+        character_changed = true
+      end
+    else
+      found_next = true
+    end
+  end
+
+  return found_next, character_changed
 end
 
 function get_chars_data()
@@ -289,24 +333,27 @@ function _hit_confirm.apply_changes()
   print(_tmp_config.dynamic, _current_confirm.dynamic)
   print(_tmp_config.opponent_index, _current_confirm.opponent_index)
 
-  
+  local restart
 
   if _tmp_config.character ~= _collection.character or _tmp_config.opponent_index ~= _current_confirm.opponent_index then
     _collection.character = _tmp_config.character
-    
     _p1 = _collection.character_list[_collection.character]
     _current_confirm = get_selected_confirm()
     _current_confirm.opponent_index = _tmp_config.opponent_index
-    _collection[_p1].confirm = _tmp_config.confirm
-    _current_confirm.guard_weight = _tmp_config.guard_weight
-    _current_confirm.dynamic = _tmp_config.dynamic
-    _hit_confirm.start()
+
+    restart = _hit_confirm.start
   else
-    _collection[_p1].confirm = _tmp_config.confirm
-    _current_confirm.guard_weight = _tmp_config.guard_weight
-    _current_confirm.dynamic = _tmp_config.dynamic
-    _hit_confirm.init()
+    restart = _hit_confirm.init
   end
+
+  _collection[_p1].confirm = _tmp_config.confirm
+  _current_confirm.guard_weight = _tmp_config.guard_weight
+  _current_confirm.dynamic = _tmp_config.dynamic
+  _current_confirm.total_confirmed = _tmp_config.total_confirmed
+  _current_confirm.side = _tmp_config.side
+  _current_confirm.swap_side = _tmp_config.swap_side
+  _collection.continue = _tmp_config.continue
+  restart()
 end
 
 function draw_text(_text, _y, _color, _outline)
@@ -325,6 +372,10 @@ function set_tmp_config()
     guard_weight = _current_confirm.guard_weight,
     dynamic = _current_confirm.dynamic,
     opponent_index = _current_confirm.opponent_index,
+    total_confirmed = _current_confirm.total_confirmed,
+    side = _current_confirm.side,
+    swap_side = _current_confirm.swap_side,
+    continue = _collection.continue,
   }
 end
 
@@ -333,8 +384,13 @@ local function _draw_overlay()
   -- To draw a PNG on screen
   -- gui.gdoverlay(_x, _y, _image_path)
 
+  local _p1 = _collection.character_list[_collection.character]
+  local _confirms_array = get_confirms_array(_collection.character)
+  local _confirm_index = _collection[_p1].confirm
+
   -- To draw text on screen
-  draw_text(string.format("Hit: %s", _hit_confirmed), 49, "teal", "black")
+  draw_text(string.format("Confirm: %s", _confirms_array[_confirm_index]), 39, "teal", "black")
+  draw_text(string.format("Hit: %s/%s", _hit_confirmed, get_selected_confirm().total_confirmed), 49, "teal", "black")
   draw_text(string.format("Miss: %s", _miss_confirmed), 59, "teal", "black")
   draw_text(string.format("Guard: %s", _guard_confirmed), 69, "teal", "black")
 end
@@ -422,6 +478,9 @@ local function _on_no_combo()
 end
 
 function _hit_confirm.init()
+  training_settings.meter_mode = 3
+  training_settings.life_mode = 2
+  training_settings.stun_mode = 2
   _current_combo_step = 1
   _is_blocking = false
   _hit_confirmed = 0
@@ -430,7 +489,27 @@ function _hit_confirm.init()
   _state = "Idle"
   _current_guard = _pick_guard()
   _current_character_adresses = _addresses[_collection.character_list[_collection.character]]
-  _current_hit_confirm_combo = get_selected_confirm().hits
+
+  local selected_confirm = get_selected_confirm()
+
+  _current_hit_confirm_combo = selected_confirm.hits
+  _current_side = selected_confirm.side
+
+  local _p1_pos_x = math.random(110, 920 - selected_confirm.players_distance)
+  local _p1_pos_x_sided
+  local _p2_pos_x_sided
+
+  if _current_side == 1 then
+    _p1_pos_x_sided = _p1_pos_x
+    _p2_pos_x_sided = _p1_pos_x + selected_confirm.players_distance
+  else
+    _p1_pos_x_sided = _p1_pos_x + selected_confirm.players_distance
+    _p2_pos_x_sided = _p1_pos_x
+  end
+
+  memory.writeword(0x02026CB0, _p1_pos_x)
+  memory.writeword(player_objects[2].base + 0x64, _p2_pos_x_sided)
+  memory.writeword(player_objects[1].base + 0x64, _p1_pos_x_sided)
 end
 
 function _hit_confirm.update()
@@ -440,33 +519,37 @@ function _hit_confirm.update()
     _hit_confirm.init()
   end
 
-  if player_objects[2].is_idle and player_objects[2].idle_time == 1 then
-    local _p1_pos_x = math.random(110, 920 - get_selected_confirm().players_distance)
-    memory.writeword(0x02026CB0, _p1_pos_x)
-    memory.writeword(player_objects[2].base + 0x64, _p1_pos_x + get_selected_confirm().players_distance)
-    memory.writeword(player_objects[1].base + 0x64, _p1_pos_x)
-    emu.speedmode("normal")
+  local selected_confirm = get_selected_confirm()
 
-    if swap_side[_config.elbow_cannon.swap_side] == "Random" then
-      current_side = math.random(1, 2)
-    elseif swap_side[_config.elbow_cannon.swap_side] == "Halfway" then
-      if ((current_attempt % _config.elbow_cannon.attempts) * 2) >= _config.elbow_cannon.attempts and not swapped then
+  if player_objects[2].is_idle and player_objects[2].idle_time == 1 then
+
+    if swap_side[selected_confirm.swap_side] == "Random" then
+      _current_side = math.random(1, 2)
+    elseif swap_side[selected_confirm.swap_side] == "Halfway" then
+      if (((_hit_confirmed + 1) % selected_confirm.total_confirmed) * 2) >= selected_confirm.total_confirmed and not swapped then
         swapped = true
-        current_side = (current_side - 3) * -1
-      elseif (current_attempt % _config.elbow_cannon.attempts) == 0 and swapped then
+        _current_side = (_current_side - 3) * -1
+      elseif (_hit_confirmed % selected_confirm.total_confirmed) == 0 and swapped then
         swapped = false
-        current_side = (current_side - 3) * -1
+        _current_side = (_current_side - 3) * -1
       end
     end
 
-    current_attempt = current_attempt + 1
+    local _p1_pos_x = math.random(110, 920 - selected_confirm.players_distance)
+    local _p1_pos_x_sided
+    local _p2_pos_x_sided
 
-    if _config.elbow_cannon.attempts > 0 and current_attempt > _config.elbow_cannon.attempts and not _config.elbow_cannon.continue then
-      _elbow_cannon.has_ended = true
+    if _current_side == 1 then
+      _p1_pos_x_sided = _p1_pos_x
+      _p2_pos_x_sided = _p1_pos_x + selected_confirm.players_distance
+    else
+      _p1_pos_x_sided = _p1_pos_x + selected_confirm.players_distance
+      _p2_pos_x_sided = _p1_pos_x
     end
-    memory.writeword(0x02026CB0, side_coordinates[current_side][1])
-    memory.writeword(player_objects[2].base + 0x64, side_coordinates[current_side][3])
-    memory.writeword(player_objects[1].base + 0x64, side_coordinates[current_side][2])
+
+    memory.writeword(0x02026CB0, _p1_pos_x)
+    memory.writeword(player_objects[2].base + 0x64, _p2_pos_x_sided)
+    memory.writeword(player_objects[1].base + 0x64, _p1_pos_x_sided)
     emu.speedmode("normal")
   end
 
@@ -491,16 +574,26 @@ function _hit_confirm.update()
   elseif player_objects[2].has_just_blocked then
     _on_block(player_objects[1].animation)
   end
-
-  -- if end_condition then
-  --  _hit_confirm.has_ended = true
-  --end
-
   
+  if selected_confirm.total_confirmed > 0 and _hit_confirmed >= selected_confirm.total_confirmed and not _collection.continue then
+    local found_next_confirm, character_changed = next_confirm()
+    if not found_next_confirm then
+      _hit_confirm.has_ended = true
+    else
+      if character_changed then
+        _hit_confirm.start()
+      else
+        _hit_confirm.init()
+      end
+    end
+  end
+
 end
 
 return _hit_confirm
 
--- Side hit_confirm
--- Reps routine hit_confirm
+-- TODO:
+
 -- Refactor
+-- Crouch confirms
+-- Dynamic mode
