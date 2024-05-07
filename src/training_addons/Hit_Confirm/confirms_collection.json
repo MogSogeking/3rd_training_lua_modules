@@ -4,7 +4,7 @@
   "ken":{
     "confirm":1,
     "2LK.2LK.SA3":{
-      "enabled":true,
+      "enabled":false,
       "guard_weight":5,
       "hit_to_confirm":3,
       "opponent_stance":["normal","crouching"],
@@ -24,12 +24,12 @@
     "confirm":1,
     "4MP.SA3":{
       "enabled":true,
-      "guard_weight":5,
+      "guard_weight":0,
       "hit_to_confirm":2,
       "opponent_stance":["normal","crouching"],
       "players_distance":100,
       "sa":3,
-      "total_confirmed":5,
+      "total_confirmed":1,
       "swap_side":1,
       "side":1,
       "opponent_index":1,

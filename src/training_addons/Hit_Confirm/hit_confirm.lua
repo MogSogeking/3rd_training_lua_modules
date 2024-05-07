@@ -109,6 +109,12 @@ function TableConcat(t1,t2)
 end
 
 function build_collection(json_path_list)
+
+  local _saved_collection = read_object_from_json_file("src/training_addons/Hit_Confirm/confirms_collection.json")
+  if _saved_collection ~= nil then
+    _collection = _saved_collection
+  end
+
   for _key, _value in pairs(json_path_list) do
     local _json = read_object_from_json_file(_value)
     if _json ~= nil and _json.character ~= nil and _json.list ~= nil then
@@ -126,13 +132,13 @@ function build_collection(json_path_list)
     if _key ~= "character" and _key ~= "character_list" and _key ~= "continue" then
       for _key_2, _value_2 in pairs(_value) do
         if _key_2 ~= "confirm" then
-          _value_2.guard_weight = 5
-          _value_2.dynamic = false
-          _value_2.opponent_index = 1
-          _value_2.side = 1
-          _value_2.swap_side = 1
-          _value_2.enabled = true
-          _value_2.total_confirmed = 5
+          _value_2.guard_weight = _value_2.guard_weight or 5
+          _value_2.dynamic = _value_2.dynamic or false
+          _value_2.opponent_index = _value_2.opponent_index or 1
+          _value_2.side = _value_2.side or 1
+          _value_2.swap_side = _value_2.swap_side or 1
+          _value_2.enabled = _value_2.enabled or true
+          _value_2.total_confirmed = _value_2.total_confirmed or 5
         end
       end
     end
@@ -213,7 +219,6 @@ function _hit_confirm.set_menu(json_path_list)
   build_collection(json_path_list)
   local _character_index = _collection.character
   local _character_object = _collection[_collection.character_list[_character_index]]
-  write_object_to_json_file(_collection, "test_collection.json")
   _config = _current_module.config
   return {
     name = "Hit confirm",
@@ -297,6 +302,8 @@ function _hit_confirm.update_menu(_menu, _menu_type)
       _menu.sub_menu_selected_index = _menu.sub_menu_selected_index - 1
     end
   end
+
+  write_object_to_json_file(_collection, "src/training_addons/Hit_Confirm/confirms_collection.json")
 end
 
 function _hit_confirm.start()
