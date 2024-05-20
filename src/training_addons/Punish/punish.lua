@@ -1,6 +1,7 @@
 local _punish = {
   is_enabled = false,
   has_ended = false,
+  json_folder_path = "src/training_addons/Punish/data/",
   training_menu = make_menu(100, 49, 283, 170, -- screen size 383,223
     {}
   ),
@@ -35,6 +36,7 @@ local _collection = {
   character = 1,
   character_list = {},
   continue = false,
+  offset = 0,
 }
 
 local _characters = {
@@ -138,7 +140,7 @@ end
 local function build_collection(json_path_list)
 
   local _saved_collection = read_object_from_json_file("src/training_addons/Punish/punishes_collection.json")
-  if _saved_collection ~= nil then
+  if _saved_collection ~= nil and #_saved_collection > 0 then
     _collection = _saved_collection
   end
 
@@ -248,7 +250,22 @@ end
 
 
 
-function _punish.set_menu(json_path_list)
+function _punish.set_menu()
+  local _cmd = "dir /b "..string.gsub(_punish.json_folder_path, "/", "\\")
+  local _f = io.popen(_cmd)
+  if _f == nil then
+    print(string.format("Error: Failed to execute command \"%s\"", _cmd))
+    return
+  end
+  local _str = _f:read("*all")
+  local json_path_list = {}
+  for _line in string.gmatch(_str, '([^\r\n]+)') do -- Split all lines that have ".json" in them
+    if string.find(_line, ".json") ~= nil then
+      local _file = string.format("%s%s", _punish.json_folder_path, _line)
+      table.insert(json_path_list, _file)
+    end
+  end
+
   build_collection(json_path_list)
   local _character_index = _collection.character
   local _character_object = _collection[_collection.character_list[_character_index]]

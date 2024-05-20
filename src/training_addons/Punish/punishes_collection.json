@@ -1,5 +1,5 @@
 {
-  "offset":20,
+  "offset":0,
   "character":1,
   "continue":false,
   "character_list":["necro"],
@@ -110,15 +110,16 @@
         "enabled":true,
         "p1_sa":3
       },
-      "JHK / Parry 4MK.1236MP.SA3":{
-        "enabled":true,
+      "SA3 (far) / 5MP.SA3":{
+        "punish":["5MP","SA3","SA3","SA3"],
+        "p2_sa":3,
         "side":1,
         "swap_side":1,
-        "players_distance":140,
-        "p2_rec":[["forward","up"],["forward","up"],["forward","up"],[],[],[],[],[],[],[],[],[],[],["HK"],[""]],
-        "p1_rec":[[""]],
+        "players_distance":100,
+        "p2_rec":[["down"],["down","forward"],["forward"],["down"],["down","forward","LP"],[""]],
+        "p1_rec":[["down","back"],["down","back"],["down","back"],["down","back"],["down","back"],["down","back"],["down","back"],["down","back"],["down","back"],["down","back"],["down","back"],["down","back"],["down","back"],["down","back"],["down","back"],["down","back"],["down","back"],["down","back"],["down","back"],["down","back"],["down","back"],["down","back"],["down","back"],["down","back"],["down","back"],["down","back"],["down","back"],["down","back"],["down","back"],["down","back"],["down","back"],["down","back"],["down","back"],["down","back"],["down","back"],["down","back"],["down","back"],["down","back"],["down","back"],["down","back"],["down","back"],["down","back"],["down","back"],["down","back"],["down","back"],["down","back"],["down","back"],["down","back"],["down","back"],["down","back"],["down","back"],["down","back"],["down","back"],["down","back"],["down","back"],["down","back"],["down","back"],["down","back"],["down","back"],["down","back"],["down","back"],["down","back"],["down","back"],["down","back"],["down","back"],["down","back"],["down","back"],["down","back"],["down","back"],["down","back"],["down","back"],["down","back"],["down","back"],["down","back"],["down","back"],["down","back"],["down","back"],["down","back"],["down","back"],["down","back"],[""]],
         "total_punished":5,
-        "punish":["4MK","1236MP","1236MP","SA3","SA3","SA3"],
+        "enabled":true,
         "p1_sa":3
       },
       "SA3 (far) / 1HP":{
@@ -133,15 +134,15 @@
         "enabled":true,
         "p1_sa":3
       },
-      "41236EXP / 4MK.SA3":{
+      "JHK / Parry 4MK.1236MP.SA3":{
         "enabled":true,
         "side":1,
         "swap_side":1,
-        "players_distance":200,
-        "p2_rec":[["back"],["back","down"],["down"],["down","forward"],["forward","MP","HP"],[""]],
-        "p1_rec":[["down","back"],["down","back"],["down","back"],["down","back"],["down","back"],["down","back"],["down","back"],["down","back"],["down","back"],["down","back"],["down","back"],["down","back"],["down","back"],["down","back"],["down","back"],["down","back"],["down","back"],["down","back"],["down","back"],["down","back"],["down","back"],["down","back"],["down","back"],["down","back"],[""]],
+        "players_distance":140,
+        "p2_rec":[["forward","up"],["forward","up"],["forward","up"],[],[],[],[],[],[],[],[],[],[],["HK"],[""]],
+        "p1_rec":[[""]],
         "total_punished":5,
-        "punish":["4MK","SA3","SA3","SA3"],
+        "punish":["4MK","1236MP","1236MP","SA3","SA3","SA3"],
         "p1_sa":3
       },
       "41236EXP / 1236EXP":{
@@ -155,32 +156,20 @@
         "punish":["1236EXP","1236EXP","1236EXP","1236EXP","1236EXP"],
         "p1_sa":3
       },
-      "SA3 (far) / 5MP.SA3":{
-        "punish":["5MP","SA3","SA3","SA3"],
-        "p2_sa":3,
+      "41236EXP / 4MK.SA3":{
+        "enabled":true,
         "side":1,
         "swap_side":1,
-        "players_distance":100,
-        "p2_rec":[["down"],["down","forward"],["forward"],["down"],["down","forward","LP"],[""]],
-        "p1_rec":[["down","back"],["down","back"],["down","back"],["down","back"],["down","back"],["down","back"],["down","back"],["down","back"],["down","back"],["down","back"],["down","back"],["down","back"],["down","back"],["down","back"],["down","back"],["down","back"],["down","back"],["down","back"],["down","back"],["down","back"],["down","back"],["down","back"],["down","back"],["down","back"],["down","back"],["down","back"],["down","back"],["down","back"],["down","back"],["down","back"],["down","back"],["down","back"],["down","back"],["down","back"],["down","back"],["down","back"],["down","back"],["down","back"],["down","back"],["down","back"],["down","back"],["down","back"],["down","back"],["down","back"],["down","back"],["down","back"],["down","back"],["down","back"],["down","back"],["down","back"],["down","back"],["down","back"],["down","back"],["down","back"],["down","back"],["down","back"],["down","back"],["down","back"],["down","back"],["down","back"],["down","back"],["down","back"],["down","back"],["down","back"],["down","back"],["down","back"],["down","back"],["down","back"],["down","back"],["down","back"],["down","back"],["down","back"],["down","back"],["down","back"],["down","back"],["down","back"],["down","back"],["down","back"],["down","back"],["down","back"],[""]],
+        "players_distance":200,
+        "p2_rec":[["back"],["back","down"],["down"],["down","forward"],["forward","MP","HP"],[""]],
+        "p1_rec":[["down","back"],["down","back"],["down","back"],["down","back"],["down","back"],["down","back"],["down","back"],["down","back"],["down","back"],["down","back"],["down","back"],["down","back"],["down","back"],["down","back"],["down","back"],["down","back"],["down","back"],["down","back"],["down","back"],["down","back"],["down","back"],["down","back"],["down","back"],["down","back"],[""]],
         "total_punished":5,
-        "enabled":true,
+        "punish":["4MK","SA3","SA3","SA3"],
         "p1_sa":3
       }
     },
     "opponent_list":["ken","gouki","dudley"],
     "ken":{
-      "2HK/SA3":{
-        "enabled":true,
-        "side":1,
-        "swap_side":1,
-        "players_distance":140,
-        "p2_rec":[["down","HK"],[""]],
-        "p1_rec":[["down","back"],["down","back"],["down","back"],["down","back"],["down","back"],["down","back"],["down","back"],["down","back"],["down","back"],["down","back"],["down","back"],["down","back"],["down","back"],["down","back"],["down","back"],["down","back"],[""]],
-        "total_punished":5,
-        "punish":["SA3","SA3","SA3"],
-        "p1_sa":3
-      },
       "623HP/1236HP.4MK.1236MP.SA3":{
         "enabled":true,
         "side":1,
@@ -192,6 +181,7 @@
         "punish":["1236HP","1236HP","1236HP","4MK","1236MP","1236MP","SA3","SA3","SA3"],
         "p1_sa":3
       },
+      "punish":3,
       "236EXP/Parry.SA3":{
         "enabled":true,
         "side":1,
@@ -203,7 +193,17 @@
         "punish":["SA3","SA3","SA3"],
         "p1_sa":3
       },
-      "punish":1
+      "2HK/SA3":{
+        "enabled":true,
+        "side":1,
+        "swap_side":1,
+        "players_distance":140,
+        "p2_rec":[["down","HK"],[""]],
+        "p1_rec":[["down","back"],["down","back"],["down","back"],["down","back"],["down","back"],["down","back"],["down","back"],["down","back"],["down","back"],["down","back"],["down","back"],["down","back"],["down","back"],["down","back"],["down","back"],["down","back"],[""]],
+        "total_punished":5,
+        "punish":["SA3","SA3","SA3"],
+        "p1_sa":3
+      }
     },
     "gouki":{
       "623HP/1236HP.4MK.1236MP.SA3":{
@@ -250,8 +250,8 @@
         "punish":["4MK","1236MP","1236MP","SA3","SA3","SA3"],
         "p1_sa":3
       },
-      "punish":1
+      "punish":3
     },
-    "opponent":3
+    "opponent":2
   }
 }

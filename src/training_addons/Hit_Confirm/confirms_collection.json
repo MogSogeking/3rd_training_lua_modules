@@ -1,5 +1,5 @@
 {
-  "character":2,
+  "character":1,
   "continue":false,
   "ken":{
     "confirm":1,
@@ -21,7 +21,7 @@
   },
   "character_list":["necro","ken"],
   "necro":{
-    "confirm":1,
+    "confirm":4,
     "4MP.SA3":{
       "enabled":true,
       "guard_weight":5,
@@ -67,19 +67,19 @@
       "hits":["MPMK","SA3","SA3","SA3"],
       "opponent":["any"]
     },
-    "623LP.SA3":{
+    "JHK.SA3":{
       "enabled":true,
       "guard_weight":5,
       "hit_to_confirm":2,
       "opponent_stance":["normal","crouching"],
-      "players_distance":40,
+      "players_distance":150,
       "sa":3,
       "total_confirmed":5,
       "swap_side":1,
       "side":1,
       "opponent_index":1,
       "dynamic":false,
-      "hits":["623LP","SA3","SA3","SA3"],
+      "hits":["JHK","SA3","SA3","SA3"],
       "opponent":["any"]
     },
     "2LK.623LP.SA3":{
@@ -97,19 +97,19 @@
       "hits":["2LK","623LP","SA3","SA3","SA3"],
       "opponent":["any"]
     },
-    "JHK.SA3":{
+    "623LP.SA3":{
       "enabled":true,
       "guard_weight":5,
       "hit_to_confirm":2,
       "opponent_stance":["normal","crouching"],
-      "players_distance":150,
+      "players_distance":40,
       "sa":3,
       "total_confirmed":5,
       "swap_side":1,
       "side":1,
       "opponent_index":1,
       "dynamic":false,
-      "hits":["JHK","SA3","SA3","SA3"],
+      "hits":["623LP","SA3","SA3","SA3"],
       "opponent":["any"]
     }
   }

@@ -1,16 +1,12 @@
-local _elbow_cannon = require("src/training_addons/Necro_Collective/elbow_cannon")
-local _stun_juggles = require("src/training_addons/Necro_Collective/stun_juggles")
 local _hit_confirm = require("src/training_addons/Hit_Confirm/hit_confirm")
 local _punish = require("src/training_addons/Punish/punish")
 
-local necro = {}
+local generic = {}
 local menu = nil
 local current_training = 0
 local is_routine = false
 
 local routine = {
-  _elbow_cannon,
-  _stun_juggles,
   _hit_confirm,
   _punish,
 }
@@ -26,8 +22,6 @@ local color_button = {
 }
 
 local selected_mode = {
-  "elbow cannon",
-  "stun juggles",
   "hit confirm",
   "punish",
 }
@@ -35,17 +29,15 @@ local selected_mode = {
 local _routine_menu = make_menu(100, 79, 283, 160, -- screen size 383,223,
   {
     button_menu_item("Skip", function()
-      necro.end_training()
+      generic.end_training()
     end),
     button_menu_item("Quit", function()
-      necro.end_routine()
+      generic.end_routine()
     end),
   }
 )
 
-necro.constants = {
-  timer_cyphers_width = 16,
-  timer_cyphers_height = 26,
+generic.constants = {
   whole_cast = {
     "Alex",
     "ChunLi",
@@ -57,7 +49,7 @@ necro.constants = {
     "Ibuki",
     "Ken",
     "Makoto",
-    "Necro",
+    "generic",
     "Oro",
     "Q",
     "Remy",
@@ -81,16 +73,14 @@ necro.constants = {
     display_hitboxes = true,
   }
 }
-necro.config = {}
+generic.config = {}
 
-necro.images = {
-  timer_frame = gd.createFromPng("src/training_addons/Necro_Collective/images/timer_frame.png"):gdStr(),
-  timer_cyphers = gd.createFromPng("src/training_addons/Necro_Collective/images/timer_cyphers.png"):gdStr(),
+generic.images = {
+
 }
 
 
-function necro.open_menu()
-  --necro.start_routine()
+function generic.open_menu()
   menu = menu or set_menu()
   gui.box(0,0,0,0,0,0)
   menu_stack_clear()
@@ -98,8 +88,8 @@ function necro.open_menu()
   menu_stack_draw()
 end
 
-function necro.set_config(_config)
-  necro.config = _config
+function generic.set_config(_config)
+  generic.config = _config
 end
 
 function set_menu()
@@ -109,15 +99,13 @@ function set_menu()
       {
         name = "General",
         entries = {
-          list_menu_item("Color", necro.config, "color_button", color_button),
-          list_menu_item("Favorite opponent", necro.config, "favorite_opponent", necro.constants.whole_cast),
-          checkbox_menu_item("Routine mode", necro.config, "routine"),
-          list_menu_item("Selected mode", necro.config, "selected_mode", selected_mode),
-          button_menu_item("Start", necro.start_routine)
+          list_menu_item("Color", generic.config, "color_button", color_button),
+          list_menu_item("Favorite opponent", generic.config, "favorite_opponent", generic.constants.whole_cast),
+          checkbox_menu_item("Routine mode", generic.config, "routine"),
+          list_menu_item("Selected mode", generic.config, "selected_mode", selected_mode),
+          button_menu_item("Start", generic.start_routine)
         }
       },
-      _elbow_cannon.set_menu(),
-      _stun_juggles.set_menu(),
       _hit_confirm.set_menu(),
       _punish.set_menu(),
     },
@@ -138,14 +126,14 @@ function character_select(p1, p2)
   emu.speedmode("turbo")
 end
 
-function necro.start_routine()
-  reset_training_data(necro.constants.training_data_to_keep)
-  if necro.config.routine then
+function generic.start_routine()
+  reset_training_data(generic.constants.training_data_to_keep)
+  if generic.config.routine then
     current_training = 1
     is_routine = true
     current_menu = _routine_menu
   else
-    current_training = necro.config.selected_mode
+    current_training = generic.config.selected_mode
     is_routine = false
     current_menu = routine[current_training].training_menu
   end
@@ -160,46 +148,46 @@ function necro.start_routine()
   end
 end
 
-function necro.start()
-  reset_training_data(necro.constants.training_data_to_keep)
+function generic.start()
+  reset_training_data(generic.constants.training_data_to_keep)
   current_training = menu.main_menu_selected_index - 1
   is_routine = false
   current_menu = routine[current_training].training_menu
   routine[current_training].start()
 end
 
-function necro.update()
+function generic.update()
   if current_training > 0 and current_training <= #routine then
     routine[current_training].update()
     if routine[current_training].has_ended then
-      necro.end_training()
+      generic.end_training()
     end
   end
   memory.writeword(0x0201543E, 0x10) -- Lock current screen timer
 end
 
-function necro.end_training()
+function generic.end_training()
   if not is_routine then
-    necro.end_routine()
+    generic.end_routine()
   else
     repeat
       current_training = current_training + 1
     until current_training > #routine or routine[current_training].is_enabled
 
     if current_training > #routine then
-      necro.end_routine()
+      generic.end_routine()
     else
       routine[current_training].start()
     end
   end
 end
 
-function necro.end_routine()
+function generic.end_routine()
   current_training = 0
   savestate.load(savestate.create("data/"..rom_name.."/savestates/results.fs"))
 end
 
-function necro.quit_training()
+function generic.quit_training()
   current_training = 0
   current_menu = main_menu
   _current_module = nil
@@ -208,4 +196,4 @@ function necro.quit_training()
   load_training_data()
 end
 
-return necro
+return generic

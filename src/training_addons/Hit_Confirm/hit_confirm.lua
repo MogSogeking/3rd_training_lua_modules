@@ -1,7 +1,8 @@
 local _hit_confirm = {
   is_enabled = false,
   has_ended = false,
-  training_menu = make_menu(100, 49, 283, 170, -- screen size 383,223
+  json_folder_path = "src/training_addons/Hit_Confirm/data/",
+  training_menu = make_menu(100, 49, 283, 180, -- screen size 383,223
     {}
   ),
 }
@@ -144,7 +145,7 @@ end
 local function build_collection(json_path_list)
 
   local _saved_collection = read_object_from_json_file("src/training_addons/Hit_Confirm/confirms_collection.json")
-  if _saved_collection ~= nil then
+  if _saved_collection ~= nil and #_saved_collection > 0 then
     _collection = _saved_collection
   end
 
@@ -182,7 +183,10 @@ local function build_entries(_character_index, _character_object, _menu_type)
   local _confirms_array = get_confirms_array(_character_index)
   local _current_confirm = get_selected_confirm()
 
-  _character_select.list = _collection.character_list
+  _character_select = list_menu_item("Character", _collection, "character", _collection.character_list)
+  _character_select.is_disabled = function ()
+    return #_collection.character_list < 2
+  end
 
   if _menu_type == "Contextual" then
     local _character_select = list_menu_item("Character", _tmp_config, "character", _collection.character_list)
@@ -311,7 +315,22 @@ local function set_tmp_config()
   }
 end
 
-function _hit_confirm.set_menu(json_path_list)
+function _hit_confirm.set_menu()
+  local _cmd = "dir /b "..string.gsub(_hit_confirm.json_folder_path, "/", "\\")
+  local _f = io.popen(_cmd)
+  if _f == nil then
+    print(string.format("Error: Failed to execute command \"%s\"", _cmd))
+    return
+  end
+  local _str = _f:read("*all")
+  local json_path_list = {}
+  for _line in string.gmatch(_str, '([^\r\n]+)') do -- Split all lines that have ".json" in them
+    if string.find(_line, ".json") ~= nil then
+      local _file = string.format("%s%s", _hit_confirm.json_folder_path, _line)
+      table.insert(json_path_list, _file)
+    end
+  end
+
   build_collection(json_path_list)
   local _character_index = _collection.character
   local _character_object = _collection[_collection.character_list[_character_index]]

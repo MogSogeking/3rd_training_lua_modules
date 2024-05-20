@@ -1,0 +1,8 @@
+{
+  "module_name": "Generic",
+  "entry_point": "index.lua",
+  "color_button": 1,
+  "routine": false,
+  "selected_mode": 1,
+  "favorite_opponent":1,
+}
