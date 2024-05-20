@@ -1,6 +1,7 @@
 local _elbow_cannon = require("src/training_addons/Necro_Collective/elbow_cannon")
 local _stun_juggles = require("src/training_addons/Necro_Collective/stun_juggles")
 local _hit_confirm = require("src/training_addons/Hit_Confirm/hit_confirm")
+local _punish = require("src/training_addons/Punish/punish")
 
 local necro = {}
 local menu = nil
@@ -11,6 +12,7 @@ local routine = {
   _elbow_cannon,
   _stun_juggles,
   _hit_confirm,
+  _punish,
 }
 
 local color_button = {
@@ -27,6 +29,7 @@ local selected_mode = {
   "elbow cannon",
   "stun juggles",
   "hit confirm",
+  "punish",
 }
 
 local _routine_menu = make_menu(100, 79, 283, 160, -- screen size 383,223,
@@ -120,10 +123,17 @@ function set_menu()
         "src/training_addons/Necro_Collective/data/hit_confirm_2.json",
         "src/training_addons/Necro_Collective/data/hit_confirm_3.json"
       }),
+      _punish.set_menu({
+        "src/training_addons/Necro_Collective/data/punish.json",
+        "src/training_addons/Necro_Collective/data/punish_2.json",
+        "src/training_addons/Necro_Collective/data/punish_3.json",
+      }),
     },
     function (_menu)
       if _menu.content[_menu.main_menu_selected_index].name == "Hit confirm" then
         _hit_confirm.update_menu(_menu)
+      elseif _menu.content[_menu.main_menu_selected_index].name == "Punish" then
+        _punish.update_menu(_menu)
       end
     end
   )
@@ -147,7 +157,7 @@ function necro.start_routine()
     is_routine = false
     current_menu = routine[current_training].training_menu
   end
-  while current_training <= #routine and not routine[current_training].is_enabled do
+  while is_routine and current_training <= #routine and not routine[current_training].is_enabled do
     current_training = current_training + 1
   end
 

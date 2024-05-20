@@ -1,0 +1,34 @@
+{
+  "character": "necro",
+  "opponent": "gouki",
+  "list": {
+    "2HK/SA3": {
+      "p1_sa": 3,
+      "punish": ["SA3", "SA3", "SA3"],
+      "players_distance": 140,
+      "p1_rec": [["down", "back"],["down", "back"],["down", "back"],["down", "back"],["down", "back"],["down", "back"],["down", "back"],["down", "back"],["down","back"],["down","back"],["down","back"],["down","back"],["down","back"],["down","back"],["down","back"],["down","back"]],
+      "p2_rec": [["down", "HK"]],
+    },
+    "623HP/1236HP.4MK.1236MP.SA3": {
+      "p1_sa": 3,
+      "punish": ["1236HP", "1236HP", "1236HP", "4MK", "1236MP", "1236MP", "SA3", "SA3", "SA3"],
+      "players_distance": 40,
+      "p1_rec": [["down", "back"],["down", "back"],["down", "back"],["down", "back"],["down", "back"],["down", "back"],["down", "back"],["down", "back"],["down","back"],["down","back"],["down","back"],["down","back"],["down","back"],["down","back"],["down","back"],["down","back"],["down","back"],["down","back"],["down","back"],["down","back"],["down","back"],["down","back"],["down","back"],["down","back"],["down","back"],["down","back"]],
+      "p2_rec": [["forward"], ["down"], ["down", "forward", "HP"]],
+    },
+    "6MP/Parry.Parry.1236HP.4MK.1236MP.SA3": {
+      "p1_sa": 3,
+      "punish": ["1236HP", "1236HP", "1236HP", "4MK", "1236MP", "1236MP", "SA3", "SA3", "SA3"],
+      "players_distance": 100,
+      "p1_rec": [],
+      "p2_rec": [["forward", "MP"]],
+    },
+    "214HK/Parry.4MK.1236MP.SA3": {
+      "p1_sa": 3,
+      "punish": ["4MK", "1236MP", "1236MP", "SA3", "SA3", "SA3"],
+      "players_distance": 100,
+      "p1_rec": [],
+      "p2_rec": [["down"], ["down", "back"], ["back", "HK"]],
+    },
+  }
+}

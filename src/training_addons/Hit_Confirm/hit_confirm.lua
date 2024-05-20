@@ -101,14 +101,47 @@ local _tmp_config = {
   continue = false,
 }
 
-function TableConcat(t1,t2)
+local function TableConcat(t1,t2)
     for _key, _value in pairs(t2) do
         t1[_key] = _value
     end
     return t1
 end
 
-function build_collection(json_path_list)
+local function get_confirms_array(index)
+  local _result = {}
+  for _key, _value in pairs(_collection[_collection.character_list[index]]) do
+    if _key ~= "confirm" then
+      table.insert(_result, _key)
+    end
+  end
+  return _result
+end
+
+local function get_stance(_name)
+  if _name == "crouching" then return 2
+  elseif _name == "jumping" then return 3
+  elseif _name == "highjumping" then return 4
+  end
+  return 1
+end
+
+local function get_opponent_list(_list)
+  if _list == nil or #_list == 0 or string.lower(_list[1]) == "any" then return _characters end
+  local _result = TableConcat({}, _list)
+  table.insert(_result, 1, "Favorite")
+  return _result
+end
+
+local function get_selected_confirm(_character)
+  _character = _character or _collection.character
+  local _p1 = _collection.character_list[_character]
+  local _confirms_array = get_confirms_array(_character)
+  local _confirm_index = _collection[_p1].confirm
+  return _collection[_p1][_confirms_array[_confirm_index]]
+end
+
+local function build_collection(json_path_list)
 
   local _saved_collection = read_object_from_json_file("src/training_addons/Hit_Confirm/confirms_collection.json")
   if _saved_collection ~= nil then
@@ -145,9 +178,11 @@ function build_collection(json_path_list)
   end
 end
 
-function build_entries(_character_index, _character_object, _menu_type)
+local function build_entries(_character_index, _character_object, _menu_type)
   local _confirms_array = get_confirms_array(_character_index)
   local _current_confirm = get_selected_confirm()
+
+  _character_select.list = _collection.character_list
 
   if _menu_type == "Contextual" then
     local _character_select = list_menu_item("Character", _tmp_config, "character", _collection.character_list)
@@ -198,43 +233,7 @@ function build_entries(_character_index, _character_object, _menu_type)
     }
 end
 
-function get_confirms_array(index)
-  local _result = {}
-  for _key, _value in pairs(_collection[_collection.character_list[index]]) do
-    if _key ~= "confirm" then
-      table.insert(_result, _key)
-    end
-  end
-  return _result
-end
-
-function get_opponent_list(_list)
-  if _list == nil or #_list == 0 or string.lower(_list[1]) == "any" then return _characters end
-  local _result = TableConcat({}, _list)
-  table.insert(_result, 1, "Favorite")
-  return _result
-end
-
-function _hit_confirm.set_menu(json_path_list)
-  build_collection(json_path_list)
-  local _character_index = _collection.character
-  local _character_object = _collection[_collection.character_list[_character_index]]
-  _config = _current_module.config
-  return {
-    name = "Hit confirm",
-    entries = build_entries(_character_index, _character_object),
-  }
-end
-
-function get_selected_confirm(_character)
-  _character = _character or _collection.character
-  local _p1 = _collection.character_list[_collection.character]
-  local _confirms_array = get_confirms_array(_collection.character)
-  local _confirm_index = _collection[_p1].confirm
-  return _collection[_p1][_confirms_array[_confirm_index]]
-end
-
-function next_confirm()
+local function next_confirm()
   local _p1 = _collection.character_list[_collection.character]
   local _confirms_array = get_confirms_array(_collection.character)
   local _confirm_index = _collection[_p1].confirm
@@ -265,7 +264,7 @@ function next_confirm()
   return found_next, character_changed
 end
 
-function get_chars_data()
+local function get_chars_data()
   local _p1 = _collection.character_list[_collection.character]
 
   local _confirm = get_selected_confirm()
@@ -284,6 +283,43 @@ function get_chars_data()
   local _p2 = string.lower(_picked_opponent)
 
   return _p1, _p2, _sa
+end
+
+local function draw_text(_text, _y, _color, _outline, _center)
+  local _text_width = get_text_width(_text)
+  local _x = (screen_width / 2) - _text_width - 20
+  if _center == true then
+    _x = (screen_width / 2) - _text_width / 2
+  end
+  gui.text(_x, _y, _text, _color, _outline)
+end
+
+local function set_tmp_config()
+  local _p1 = _collection.character_list[_collection.character]
+  local _confirm_index = _collection[_p1].confirm
+  local _current_confirm = get_selected_confirm()
+  _tmp_config = {
+    character = _collection.character,
+    confirm = _confirm_index,
+    guard_weight = _current_confirm.guard_weight,
+    dynamic = _current_confirm.dynamic,
+    opponent_index = _current_confirm.opponent_index,
+    total_confirmed = _current_confirm.total_confirmed,
+    side = _current_confirm.side,
+    swap_side = _current_confirm.swap_side,
+    continue = _collection.continue,
+  }
+end
+
+function _hit_confirm.set_menu(json_path_list)
+  build_collection(json_path_list)
+  local _character_index = _collection.character
+  local _character_object = _collection[_collection.character_list[_character_index]]
+  _config = _current_module.config
+  return {
+    name = "Hit confirm",
+    entries = build_entries(_character_index, _character_object),
+  }
 end
 
 function _hit_confirm.update_menu(_menu, _menu_type)
@@ -332,14 +368,6 @@ function _hit_confirm.apply_changes()
   local _p1 = _collection.character_list[_collection.character]
   local _confirm_index = _collection[_p1].confirm
   local _current_confirm = get_selected_confirm()
-
-  print("=================================================")
-  print(_tmp_config.character, _collection.character)
-  print(_tmp_config.confirm, _confirm_index, _collection[_p1].confirm)
-  print(_tmp_config.guard_weight, _current_confirm.guard_weight)
-  print(_tmp_config.dynamic, _current_confirm.dynamic)
-  print(_tmp_config.opponent_index, _current_confirm.opponent_index)
-
   local restart
 
   if _tmp_config.character ~= _collection.character or _tmp_config.opponent_index ~= _current_confirm.opponent_index then
@@ -363,29 +391,6 @@ function _hit_confirm.apply_changes()
   restart()
 end
 
-function draw_text(_text, _y, _color, _outline)
-  local _text_width = get_text_width(_text)
-  local _x = (screen_width / 2) - _text_width - 20
-  gui.text(_x, _y, _text, _color, _outline)
-end
-
-function set_tmp_config()
-  local _p1 = _collection.character_list[_collection.character]
-  local _confirm_index = _collection[_p1].confirm
-  local _current_confirm = get_selected_confirm()
-  _tmp_config = {
-    character = _collection.character,
-    confirm = _confirm_index,
-    guard_weight = _current_confirm.guard_weight,
-    dynamic = _current_confirm.dynamic,
-    opponent_index = _current_confirm.opponent_index,
-    total_confirmed = _current_confirm.total_confirmed,
-    side = _current_confirm.side,
-    swap_side = _current_confirm.swap_side,
-    continue = _collection.continue,
-  }
-end
-
 -- If you want to add graphics over screen
 local function _draw_overlay()
   -- To draw a PNG on screen
@@ -396,7 +401,7 @@ local function _draw_overlay()
   local _confirm_index = _collection[_p1].confirm
 
   -- To draw text on screen
-  draw_text(string.format("Confirm: %s", _confirms_array[_confirm_index]), 39, "teal", "black")
+  draw_text(string.format("Confirm: %s", _confirms_array[_confirm_index]), 39, "teal", "black", true)
   draw_text(string.format("Hit: %s/%s", _hit_confirmed, get_selected_confirm().total_confirmed), 49, "teal", "black")
   draw_text(string.format("Miss: %s", _miss_confirmed), 59, "teal", "black")
   draw_text(string.format("Guard: %s", _guard_confirmed), 69, "teal", "black")
@@ -405,7 +410,6 @@ end
 local function _pick_guard()
   local weight = get_selected_confirm().guard_weight
   local rn = math.random(0, 9)
-  print(weight, rn)
   return rn < weight
 end
 
@@ -519,14 +523,6 @@ function _hit_confirm.init()
   memory.writeword(player_objects[1].base + 0x64, _p1_pos_x_sided)
 end
 
-function get_stance(_name)
-  if _name == "crouching" then return 2
-  elseif _name == "jumping" then return 3
-  elseif _name == "highjumping" then return 4
-  end
-  return 1
-end
-
 function _hit_confirm.update()
   if not is_in_match then return end
 
@@ -598,6 +594,7 @@ function _hit_confirm.update()
     local found_next_confirm, character_changed = next_confirm()
     if not found_next_confirm then
       _hit_confirm.has_ended = true
+      _collection.character = 1
     else
       if character_changed then
         _hit_confirm.start()
